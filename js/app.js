@@ -1,5 +1,5 @@
 'use strict';
-const allowedRoundsTimes = 20;
+const allowedRoundsTimes = 25;
 let renderTimes = 1;
 const productNames = ['bag.jpg', 'banana.jpg', 'sweep.png', 'bathroom.jpg', 'boots.jpg', 'bubblegum.jpg', 'chair.jpg', 'cthulhu.jpg', 'dog-duck.jpg', 'dragon.jpg', 'pen.jpg', 'usb.gif', 'pet-sweep.jpg', 'scissors.jpg', 'shark.jpg', 'tauntaun.jpg', 'unicorn.jpg', 'breakfast.jpg', 'water-can.jpg', 'wine-glass.jpg'];
 /*----------------------------------------------*/
@@ -23,8 +23,26 @@ function ProductObject(name) {
   this.votes = 0,
   this.show = 0,
   ProductObject.all.push(this);
+  // settingItem();
 }
 ProductObject.all = [];
+/********************************************************************* */
+function settingItem() {
+  let data = JSON.stringify(ProductObject.all);
+  // console.log(data);
+  localStorage.setItem('product', data);
+}
+function gettingItem() {
+  let stringObj = localStorage.getItem('product');
+  // console.log('from the local storage', stringObj);
+  let normalObj = JSON.parse(stringObj);
+  // console.log('after parsing', normalObj);
+  if (normalObj !== null) {
+
+    ProductObject.all= normalObj;
+  }
+  handleBtnClick();
+}
 
 /***************make instances from the constructer ****************** */
 for (let i = 0; i < productNames.length; i++) {
@@ -32,15 +50,15 @@ for (let i = 0; i < productNames.length; i++) {
 }
 // console.log(ProductObject.all);
 
-function generatThreeRandomProduct() {
+/**************************************************************** */
+/********************** Start renderProduct Function ********************* */
+/**************************************************************** */
+function generatThreeRandomProduct() { //this function to generat three products randomly
   firstRandomProduct = getRandomNumber(0, productNames.length - 1);
   secondRandomProduct = getRandomNumber(0, productNames.length - 1);
   thirdRandomProduct = getRandomNumber(0, productNames.length - 1);
   // return firstRandomProduct,secondRandomProduct,thirdRandomProduct;
 }
-/**************************************************************** */
-/********************** Start renderProduct Function ********************* */
-/**************************************************************** */
 function renderProducts() {
 
   generatThreeRandomProduct();
@@ -53,7 +71,7 @@ function renderProducts() {
   while (previousIteration.includes(firstRandomProduct) || previousIteration.includes(secondRandomProduct) || previousIteration.includes(thirdRandomProduct) || firstRandomProduct === secondRandomProduct || secondRandomProduct === thirdRandomProduct || firstRandomProduct === thirdRandomProduct) {
     generatThreeRandomProduct();
   }
-  console.log(previousIteration);
+  // console.log(previousIteration);
   previousIteration = [];
 
   /* Start the dom actions to display the first image */
@@ -76,9 +94,10 @@ function renderProducts() {
   rightProductContainer.src = ProductObject.all[thirdRandomProduct].path;
   rightProductContainer.title = ProductObject.all[thirdRandomProduct].name;
   rightProductContainer.alt = ProductObject.all[thirdRandomProduct].name;
-  console.log(previousIteration);
+  // console.log(previousIteration);
 }
 renderProducts();
+gettingItem();
 
 /**************************************************************** */
 /********************** Start Image handle click function ********************* */
@@ -103,7 +122,7 @@ function handleClick(event) {
         // console.log('right');
         ProductObject.all[secondRandomProduct].votes++;
       }
-      console.log(ProductObject.all);
+      // console.log(ProductObject.all);
       renderProducts();
     }
     renderTimes++;
@@ -119,10 +138,10 @@ showResultBtn.addEventListener('click', handleBtnClick);
 /********************** Start handleBtnClick Function ********************* */
 /**************************************************************** */
 function handleBtnClick() {
-  console.log('hi');
+  // console.log('hi');
 
   for (let i = 0; i < productNames.length; i++) {
-    console.log(`${ProductObject.all[i].name} had ${ProductObject.all[i].votes} Votes, And was seen ${ProductObject.all[i].show} Times.`);
+    // console.log(`${ProductObject.all[i].name} had ${ProductObject.all[i].votes} Votes, And was seen ${ProductObject.all[i].show} Times.`);
     let litextContent = `${ProductObject.all[i].name} had ${ProductObject.all[i].votes} Votes, And was seen ${ProductObject.all[i].show} Times.`;
     votes.push(ProductObject.all[i].votes);
     views.push(ProductObject.all[i].show);
@@ -139,6 +158,7 @@ function handleBtnClick() {
   let canvasTag = document.getElementById('myChart');
   canvasTag.style.display = 'block';
   showResultBtn.removeEventListener('click', handleBtnClick);
+  settingItem();
   chartRender();
 }
 
